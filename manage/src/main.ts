@@ -16,14 +16,11 @@ const store = useStore()
 
 
 const SotreItem = localStorage.getItem('store')
-if(SotreItem){
-    console.log(JSON.parse(SotreItem).routerList);
-    
+if(SotreItem){    
     store.dynamicMenu(JSON.parse(SotreItem).routerList)
     store.routerList.forEach(e =>{
         router.addRoute('main', toRaw(e))
     })
-    console.log(router);
 }
 app.use(router)
 app.component('PanelHead',PanelHead)

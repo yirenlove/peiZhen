@@ -1,11 +1,11 @@
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const express = require("express");
-const router = require('./routes');
+const login = require('./routes/login')
 const { log } = require("debug/src/browser");
 const stroeMap = new Map()
 const app = express();
-app.use(router)
+app.use(login)
 app.use(express.urlencoded({ extended: true }));
 const transporter = nodemailer.createTransport({
   host: "smtp.qq.com",
