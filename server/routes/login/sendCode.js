@@ -18,16 +18,17 @@ function verifyCode(len) {
   return code;
 }
 // async..await is not allowed in global scope, must use a wrapper
-async function main(mail) {
-    const code = verifyCode(6);
+async function main(email) {
+  const code = verifyCode(6);
   // send mail with defined transport object
   const info = await transporter.sendMail({
     from: '"<3166925965@qq.com>', // sender address
-    to: `${mail}`, // list of receivers
+    to: `${email}`, // list of receivers
     subject: "注册验证码", // Subject line
     text: `您的验证码是${code},仅5分钟内有效`, // plain text body
     html: `<b>您的验证码是${code},仅5分钟内有效</b>`, // html body
   });
+  return Promise.resolve(code)
 }
 
 module.exports = main
