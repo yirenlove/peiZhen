@@ -19,13 +19,13 @@ export const authAdmin = (data: string) => {
 }
 
 // 菜单权限数据
-export const getMenu = () => {
-    return request.get('user/admin')
+export const getTreeMenu = () => {
+    return request.get('/permissionMenu')
 }
 
 // 菜单权限修改
 export const setMenu = (data: any) => {
-    return request.post('/user/setmenu', data)
+    return request.post('/addPermission', data)
 }
 
 // 菜单权限列表

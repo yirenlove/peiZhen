@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { FormInstance } from 'element-plus';
 import { ref, onMounted, nextTick } from 'vue';
-import { menuList } from '../../../api';
+import { menuList, getTreeMenu, setMenu } from '../../../api';
 
 
 const visible = ref(false)
@@ -49,7 +49,8 @@ const confirm = async (formRef: any) => {
     await formRef.validate((valida: any, fields: any) => {
         if (valida) {
             const selectList = treeRef.value.getCheckedKeys()
-            JSON.stringify(selectList)
+            const permissions = JSON.stringify(selectList)
+            setMenu({ name: formData.value.name, permissions })
         } else {
             console.log('error,fail to submit', fields)
         }
@@ -57,7 +58,7 @@ const confirm = async (formRef: any) => {
 
 }
 
-const tableData = ref({
+const tableData = ref({ 
     list: [],
     total: 4
 })
@@ -79,7 +80,6 @@ const open = (data: any = null) => {
     if (data) {
         // 弹窗打开form是异步
         console.log(data);
-
         nextTick(() => {
             formData.value.name = data.name
             treeRef.value.setCheckedKeys(data.permissions)
@@ -118,15 +118,18 @@ const data = ref([
 ])
 
 // 下方页码数据
-const handleSizeChange = (val:number)=>{
+const handleSizeChange = (val: number) => {
     paginationData.value.pageSize = val
-    
+
 }
-const handleCurrentChange = (val:number)=>{
+const handleCurrentChange = (val: number) => {
     paginationData.value.pageNum = val
 }
 onMounted(() => {
-
+    // 拿树状菜单权限数据
+    getTreeMenu().then(res => {
+        permissionData.value = res.data
+    })
 })
 </script>
 

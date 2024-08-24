@@ -1,20 +1,26 @@
 const express = require("express");
+const connect = require("./utils/db");
 const login = require("./routes/login");
-const { log } = require("debug/src/node");
-const jwt = require("jsonwebtoken");
+const permissions = require("./routes/permission");
 const cors = require("cors");
 const app = express();
+connect()
 app.use(
   cors({
     origin: "*",
-    allowedHeaders: "authorization",
+    allowedHeaders: "authorization,content-type",
     maxAge: 600,
   })
 );
 
-app.use(express.urlencoded({ extended: true }));
-app.use(login);
 
+app.get('/hhh',(req,resp)=>{
+  resp.end('hhh')
+})
+
+app.use(express.json());
+app.use(login);
+app.use(permissions)
 app.listen(3000, () => {
   console.log("server is running on port 3000");
 });
