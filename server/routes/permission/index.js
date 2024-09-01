@@ -13,4 +13,28 @@ router.post("/addPermission", (req, resp, next) => {
   });
 });
 
+router.get("/getPermissionList", (req, resp, next) => {
+  const { pageNumber, pageSize } = req.body;
+  manegePer.getPermissionList(pageNumber, pageSize).then((res) => {
+    manegePer.getPermissionListTotal().then((conseq) => {
+      resp.send({
+        code: 1000,
+        msg: "获取成功",
+        data: {
+          list: res,
+          total: conseq[0].cnt,
+        },
+      });
+    });
+  });
+});
+
+router.get("/getPermissions", (req, resp, next) => {
+  const token = req.headers.authorization;
+  const res = manegePer.getPermissions(token);
+  res.then((res) => {
+    resp.send(res);
+  });
+});
+
 module.exports = router;

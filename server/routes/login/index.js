@@ -4,10 +4,6 @@ const store = require("./store");
 const { log } = require("debug/src/node");
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
-  res.end("hi");
-});
-
 router.post("/getCode", (req, res, next) => {
   const email = req.body.email;
   try {
@@ -25,11 +21,11 @@ router.post("/getCode", (req, res, next) => {
 
 router.post("/signUp", (req, response, next) => {
   const { email, passw, code } = req.body;
-  store.getCode(email).then(res => {
+  log(email, passw, code);
+  store.getCode(email).then((res) => {
     if (res) {
       if (res.email === email && res.code === code) {
         store.createUser(email, passw).then((result) => {
-          log(result)
           response.send({
             code: 1000,
             msg: "注册成功",
@@ -47,6 +43,7 @@ router.post("/signUp", (req, response, next) => {
 
 router.post("/login", (req, resp, next) => {
   const { email, passw } = req.body;
+  log(email, passw);
   store.verifyUser(email, passw).then((res) => {
     resp.send(res);
   });

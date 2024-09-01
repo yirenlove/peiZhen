@@ -4,7 +4,7 @@ import { ref } from "vue";
 const useStore = defineStore("store",()=>{
     const isCollapse = ref<boolean>(false);
     const selectMenu = ref<any>([]);
-    const routerList = ref([])
+    const routerList = ref<any>([])
     const menuActive = ref<string>('')
     function closeMenu(item:object){
         if(selectMenu.value.indexOf(item)!==-1){

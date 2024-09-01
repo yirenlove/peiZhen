@@ -14,10 +14,6 @@ app.use(
 );
 
 
-app.get('/hhh',(req,resp)=>{
-  resp.end('hhh')
-})
-
 app.use(express.json());
 app.use(login);
 app.use(permissions)

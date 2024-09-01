@@ -13,27 +13,36 @@ const treeRef = ref()
 const permissionData = ref([
     {
         label: '控制台',
-        id: 1
+        id: 1,
+        disabled: true
     },
     {
         label: '权限管理',
         id: 2,
-        disabled: true,
         children: [
             {
                 label: '账号管理',
                 id: 3,
-                disabled: true
             },
             {
                 label: '菜单管理',
                 id: 4,
-                disabled: true
             }
         ]
     },
     {
-        label: '陪诊'
+        label: '陪诊',
+        id: 5,
+        children: [
+            {
+                label: '订单管理',
+                id: 6,
+            },
+            {
+                label: '陪护管理',
+                id: 7,
+            }
+        ]
     }
 ])
 // 表单校验
@@ -58,13 +67,13 @@ const confirm = async (formRef: any) => {
 
 }
 
-const tableData = ref({ 
+const tableData = ref({
     list: [],
     total: 4
 })
 
 const paginationData = ref({
-    pageNum: 1,
+    pageNumber: 1,
     pageSize: 10
 })
 const getTableData = () => {
@@ -91,27 +100,27 @@ const open = (data: any = null) => {
 const beforeClose = () => {
     visible.value = false
     formRef.value?.resetFields()
-    treeRef.value.setCheckedKeys([4, 3])
+    treeRef.value.setCheckedKeys([1])
 }
 // 权限列表
 const data = ref([
     {
-        id: 1,
+        id: 'ofjejawojifjeiowaj',
         name: '管理员',
         permissionName: '控制台'
     },
     {
-        id: 2,
+
         name: '管理员',
         permissionName: '控制台'
     },
     {
-        id: 3,
+
         name: '管理员',
         permissionName: '控制台'
     },
     {
-        id: 4,
+
         name: '管理员',
         permissionName: '控制台'
     }
@@ -123,12 +132,15 @@ const handleSizeChange = (val: number) => {
 
 }
 const handleCurrentChange = (val: number) => {
-    paginationData.value.pageNum = val
+    paginationData.value.pageNumber = val
 }
 onMounted(() => {
     // 拿树状菜单权限数据
     getTreeMenu().then(res => {
         permissionData.value = res.data
+    })
+    getTreeMenu().then(res => {
+        console.log(res);
     })
 })
 </script>
@@ -143,7 +155,7 @@ onMounted(() => {
             </el-form-item>
             <el-form-item label="权限" prop="premissions">
                 <el-tree ref="treeRef" node-key="id" :data="permissionData" :show-checkbox="true"
-                    :default-checked-keys="[3, 4]" />
+                    :default-checked-keys="[1]" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -160,7 +172,7 @@ onMounted(() => {
             </template>
         </el-table-column>
     </el-table>
-    <el-pagination style="justify-content: flex-end;" v-model:current-page="paginationData.pageNum"
+    <el-pagination style="justify-content: flex-end;" v-model:current-page="paginationData.pageNumber"
         :page-size="paginationData.pageSize" layout="total, prev, pager, next" :total="tableData.total"
         @size-change="handleSizeChange" @current-change="handleCurrentChange" size="small" />
 </template>

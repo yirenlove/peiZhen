@@ -9,11 +9,14 @@ const https = axios.create({
 // 添加请求拦截器
 https.interceptors.request.use(function (config) {
     // 获取token
+    config.headers["Content-Type"] = "application/json";
     const token = localStorage.getItem("token");
+    
     // 不需要token的接口
     const whiteUrl = ['/getCode', '/signUp', '/login']
     if (token && !whiteUrl.includes(config.url as string)) {
-        config.headers.token = token
+        config.headers.Authorization = token
+        
     }
     return config;
 }, function (error) {

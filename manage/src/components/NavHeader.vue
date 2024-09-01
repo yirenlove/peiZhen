@@ -32,7 +32,8 @@ const handleClose = (item: { meta: { path: string } }) => {
 const logout = (command: any) => {
     if (command === 'yes') {
         localStorage.removeItem('token')
-        location.href = location.origin
+        localStorage.removeItem('store')
+        router.replace('/login')
     }
 }
 </script>

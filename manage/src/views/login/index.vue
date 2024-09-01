@@ -7,9 +7,9 @@ const handleChange = () => {
 }
 
 const userData = ref({
-    username: '',
-    password: '',
-    validCode: ''
+    email: '',
+    passw: '',
+    code: ''
 })
 
 
@@ -19,7 +19,8 @@ const validText = ref<{ text: string, time: number }>({
 })
 let flag = false
 const decrease = () => {
-    if (flag) return
+    const rgex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+    if (flag || !rgex.test(userData.value.email)) return
     const time = setInterval(() => {
         validText.value.time -= 1
         if (validText.value.time === 0) {
@@ -31,7 +32,7 @@ const decrease = () => {
         validText.value.text = validText.value.time + 's'
     }, 1000);
     flag = true
-    getCode(JSON.stringify({ phoneNumber: userData.value.username })).then(res => {
+    getCode(JSON.stringify({ email: userData.value.email })).then(res => {
         ElMessage.success('发送成功')
         console.log(res);
 
@@ -41,10 +42,10 @@ const decrease = () => {
 // 表单校验
 const nameValidator = (rule: any, value: string, callback: any) => {
     if (!value) {
-        callback(new Error('请输入手机号'))
+        callback(new Error('请输入邮箱'))
     } else {
-        const rgex = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
-        rgex.test(value) ? callback() : callback(new Error('手机号格式错误'))
+        const rgex = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+        rgex.test(value) ? callback() : callback(new Error('邮箱格式错误'))
     }
 }
 const passwValidator = (rule: any, value: string, callback: any) => {
@@ -56,12 +57,12 @@ const passwValidator = (rule: any, value: string, callback: any) => {
     }
 }
 const rules = reactive({
-    username: [{ validator: nameValidator, trigger: 'blur' }],
-    password: [{ validator: passwValidator, trigger: 'blur' }],
+    email: [{ validator: nameValidator, trigger: 'blur' }],
+    passw: [{ validator: passwValidator, trigger: 'blur' }],
 })
 
 // 提交表单
-import { getCode, signUp, login } from '../../api';
+import { getCode, signUp, login, menuPermission } from '../../api';
 import { ElMessage, FormInstance } from 'element-plus';
 import { useRouter } from 'vue-router';
 import useStore from '../../store';
@@ -70,84 +71,25 @@ const store = useStore()
 const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return
     await formEl.validate((valid, fields) => {
-        store.dynamicMenu([
-            {
-                path: 'dashboard',
-                meta: { name: '控制台', path: '/dashboard',id:1 },
-                component: ''
-            },
-            {
-                path: 'auth',
-                meta: { name: '权限管理', path: '/auth',id:2 },
-                children: [
-                    {
-                        path: 'admin',
-                        component: '',
-                        meta: { name: '账号管理', path: '/auth/admin',id:1 }
-                    },
-                    {
-                        path: 'group',
-                        component: '',
-                        meta: { name: '角色管理', path: '/auth/group',id:2 }
-                    }
-                ]
-            },
-            {
-                path:'vppz',
-                meta:{name:'陪诊人员',path:'/vppz',id:3},
-                children:[
-                    {
-                        path:'order',
-                        component:'',
-                        meta:{name:'订单管理',path:'/vppz/order',id:1}
-                    },
-                    {
-                        path:'staff',
-                        component:'',
-                        meta:{name:'陪护管理',path:'/vppz/staff',id:2}
-                    }
-                ]
-            }
-        ])
-        store.routerList.forEach(e => {
-            router.addRoute('main',e)
-        })
-        router.push('/')
         if (valid) {
             if (!toggle.value) {
+                console.log(JSON.stringify(userData.value))
                 login(JSON.stringify(userData.value)).then((data: any) => {
                     ElMessage.success('登录成功')
                     // 保存token信息
-                    localStorage.setItem('token', data.token)
-                    store.dynamicMenu([
-                        {
-                            path:'dashboard',
-                            meta:{name:'控制台',path:'/dashboard'},
-                            component:''
-                        },
-                        {
-                            Path:'auth',
-                            meta:{name:'权限管理',path:'/auth'},
-                            children:[
-                                {
-                                    path: 'admin',
-                                    component: '',
-                                    meta:{name:'账号管理',Path:'/auth/admin'}
-                                },
-                                {
-                                    path:'group',
-                                    component:'',
-                                    meta:{name:'角色管理',Path:'/auth/group'}
-                                }
-                            ]
-                        }
-                    ])
-                    console.log('ok')
-                    router.push('/')
+                    localStorage.setItem('token', data.data.token)
+                    menuPermission().then(res => {
+                        store.dynamicMenu(JSON.parse(res.data.permissions))
+                        store.routerList.forEach((e: any) => {
+                            router.addRoute('main', e)
+                        })
+                        router.push('/dashboard')
+                    })
                 })
             }
             else {
                 signUp(JSON.stringify(userData.value)).then(res => {
+                    console.log(res)
                     ElMessage('注册成功')
                     toggle.value = !toggle.value
                 })
@@ -175,19 +117,18 @@ const formRef = ref<FormInstance>()
                 !toggle ? '注册账号' : '返回登录' }}</el-link></div>
             <div class="main-body">
                 <el-form ref="formRef" :model="userData" label-width="auto" :rules="rules">
-                    <el-form-item prop="username"><el-input v-model="userData.username" placeholder="请输入手机号">
+                    <el-form-item prop="email"><el-input v-model="userData.email" placeholder="请输入邮箱">
                             <template #prefix>
                                 <i class="iconfont icon-icon-test1"></i>
                             </template>
                         </el-input></el-form-item>
-                    <el-form-item prop="password"><el-input type="password" :show-password="true"
-                            v-model="userData.password" placeholder="请输入密码">
+                    <el-form-item prop="passw"><el-input type="passw" :show-passw="true" v-model="userData.passw"
+                            placeholder="请输入密码">
                             <template #prefix>
                                 <i class="iconfont icon-icon-test"></i>
                             </template>
                         </el-input></el-form-item>
-                    <el-form-item v-show="toggle" prop="validCode"><el-input v-model="userData.validCode"
-                            placeholder="请输入验证码">
+                    <el-form-item v-show="toggle" prop="code"><el-input v-model="userData.code" placeholder="请输入验证码">
                             <template #prefix>
                                 <i class="iconfont icon-icon-test"></i>
                             </template>

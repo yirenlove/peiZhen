@@ -10,7 +10,9 @@ export const signUp = (data: string) => {
 }
 // 登录
 export const login = (data: string) => {
-    return request.post('/login', data)
+    return request.post('/login', data,{
+        headers:{"Content-Type": "application/json"}
+    })
 }
 
 // 权限管理列表
@@ -35,13 +37,16 @@ export const menuList = (data: any) => {
 
 // 权限下拉列表
 export const menuSelectList = () => {
-
+    
 }
 
-// 用户菜单权限
+// 获取用户所拥有的权限
 export const menuPermission = () => {
-    return request.get('/menu/permissions')
+    return request.get('/getPermissions',{
+        headers: { 'Content-Type': 'application/json' }
+    })
 }
+
 // 获取陪诊头像列表
 export const photoList = () => {
     return request.get('/photo/list')
